@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { X, Phone, MessageCircle, Check, Mail, Droplet, Layers, Tag, FileDown, AlertCircle } from 'lucide-react';
+import { X, Phone, MessageCircle, Check, Mail, Droplet, Layers, Tag, FileDown, AlertCircle, Plus, Trash2 } from 'lucide-react';
+import type { OrderItem } from './Services';
 
 const productSizes = ['9×12', '10×14', '12×16', '12×18', '13×18', '14×18', '16×20', 'Customized Size'];
 const productColours = [
@@ -20,7 +21,7 @@ const printingOptions = [
 ];
 
 const gsmOptions = [
-  '60 GSM', '70 GSM', '80 GSM', '90 GSM', '100 GSM', '110 GSM', '120 GSM'
+  '60 GSM', '70 GSM'
 ];
 
 const featuresList = [
@@ -38,7 +39,19 @@ const images = [
   "https://images.unsplash.com/photo-1584852959828-09559cb315c1?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80"
 ];
 
-export default function ProductModal({ isOpen, onClose, product }: { isOpen: boolean; onClose: () => void; product: any }) {
+export default function ProductModal({ 
+  isOpen, 
+  onClose, 
+  product,
+  orderItems,
+  setOrderItems
+}: { 
+  isOpen: boolean; 
+  onClose: () => void; 
+  product: any;
+  orderItems: OrderItem[];
+  setOrderItems: (items: OrderItem[]) => void;
+}) {
   const [activeImage, setActiveImage] = useState(0);
   
   // Quotation State
@@ -71,25 +84,21 @@ export default function ProductModal({ isOpen, onClose, product }: { isOpen: boo
 
   if (!isOpen || !product) return null;
 
-  const minOrder = selectedColour === 'White' ? 10 : 50;
+  const minOrder = selectedSize === 'Customized Size' ? 50 : (selectedColour === 'White' ? 10 : 50);
   const isQtyValid = quantity && !isNaN(Number(quantity)) && Number(quantity) >= minOrder;
   const qtyNumber = Number(quantity);
 
-  const calculatePrice = () => {
-    if (!selectedSize || !selectedColour || !selectedPrinting || !selectedGSM || !isQtyValid) return null;
+  const calculateSlabs = () => {
+    if (!selectedSize || !selectedColour || !selectedPrinting || !selectedGSM) return null;
     
-    // Default base calculations
-    let basePrice = selectedColour === 'White' ? 85 : 90;
-    
-    if (selectedPrinting === 'Single Side Printing') basePrice += 5;
-    if (selectedPrinting === 'Double Side Printing') basePrice += 10;
-    if (selectedPrinting === 'Multi Colour Printing') basePrice += 15;
-    
-    if (selectedSize === 'Customized Size') basePrice += 5;
+    // Default base slabs depending on colour
+    let slabsStr = selectedColour === 'White' 
+      ? '10-29:85, 30-49:80, 50-74:75, 75-99:70, 100+:65' 
+      : '50-74:80, 75-99:75, 100+:70';
 
     // Check Admin Rules
     try {
-      const savedRules = localStorage.getItem('sve_pricing_rules');
+      const savedRules = localStorage.getItem('sve_pricing_rules_v2');
       if (savedRules) {
         const rules = JSON.parse(savedRules);
         // Find best match (most specific first)
@@ -100,23 +109,74 @@ export default function ProductModal({ isOpen, onClose, product }: { isOpen: boo
           (r.gsm === 'Any' || r.gsm === selectedGSM) &&
           (r.printing === 'Any' || r.printing === selectedPrinting)
         );
-        if (match && match.pricePerKg > 0) {
-          basePrice = match.pricePerKg;
+        if (match && match.slabs) {
+          slabsStr = match.slabs;
         }
       }
     } catch (e) {
       console.error(e);
     }
 
-    return basePrice;
+    return slabsStr;
   };
 
-  const pricePerKg = calculatePrice();
+  const getPriceForQty = (slabsStr: string, qty: number) => {
+    if (!qty || isNaN(qty)) return null;
+    const parts = slabsStr.split(',').map(s => s.trim());
+    let applicablePrice = null;
+    for (const p of parts) {
+      if (!p.includes(':')) continue;
+      const [range, priceStr] = p.split(':');
+      const price = Number(priceStr);
+      if (range.includes('+')) {
+        const min = Number(range.replace('+', ''));
+        if (qty >= min) applicablePrice = price;
+      } else {
+        const [min, max] = range.split('-').map(Number);
+        if (qty >= min && qty <= max) applicablePrice = price;
+      }
+    }
+    return applicablePrice;
+  };
+
+  const slabsStr = calculateSlabs();
+  const pricePerKg = slabsStr ? getPriceForQty(slabsStr, qtyNumber) : null;
   const totalPrice = pricePerKg && qtyNumber ? pricePerKg * qtyNumber : null;
 
+  const handleAddToOrder = () => {
+    if (!pricePerKg || !totalPrice || !isQtyValid) return;
+    const newItem: OrderItem = {
+      id: Date.now().toString(),
+      productTitle: product.title,
+      size: selectedSize === 'Customized Size' ? `Custom (${customWidth}" x ${customHeight}")` : selectedSize,
+      colour: selectedColour,
+      gsm: selectedGSM,
+      printing: selectedPrinting,
+      quantity: qtyNumber,
+      price: pricePerKg,
+    };
+    setOrderItems([...orderItems, newItem]);
+    
+    setSelectedSize('');
+    setCustomWidth('');
+    setCustomHeight('');
+    setSelectedColour('');
+    setSelectedPrinting('');
+    setSelectedGSM('');
+    setQuantity('');
+  };
+
+  const handleDeleteItem = (id: string) => {
+    setOrderItems(orderItems.filter(item => item.id !== id));
+  };
+
   const generateWhatsAppMessage = () => {
-    const sizeText = selectedSize === 'Customized Size' ? `Custom (${customWidth}" x ${customHeight}")` : selectedSize;
-    const msg = `Hello,\n\nI would like to request a quotation.\n\nProduct: ${product.title}\nSize: ${sizeText}\nColour: ${selectedColour}\nPrinting: ${selectedPrinting}\nGSM: ${selectedGSM}\nQuantity: ${quantity} KG\nEstimated Cost: ₹${totalPrice}\n\nPlease contact me.`;
+    let msg = `Hello,\n\nI would like to request a quotation for the following order:\n\n`;
+    orderItems.forEach((item, index) => {
+      msg += `${index + 1}. ${item.productTitle} - ${item.size}\n   Colour: ${item.colour} | GSM: ${item.gsm} | Printing: ${item.printing}\n   Qty: ${item.quantity} KG @ ₹${item.price}/KG\n   Subtotal: ₹${item.quantity * item.price}\n\n`;
+    });
+    const grandTotal = orderItems.reduce((sum, item) => sum + (item.quantity * item.price), 0);
+    msg += `Estimated Grand Total: ₹${grandTotal}\n\nPlease contact me.`;
     return encodeURIComponent(msg);
   };
 
@@ -274,7 +334,9 @@ export default function ProductModal({ isOpen, onClose, product }: { isOpen: boo
                     {selectedColour && (
                       <p className="text-xs text-stone-400 mt-3 flex items-start gap-1.5">
                         <AlertCircle size={14} className="text-green-400 shrink-0 mt-0.5"/>
-                        White bags can be ordered from 10 KG. All coloured bags require a minimum order of 50 KG.
+                        {selectedSize === 'Customized Size' 
+                          ? 'Customized sizes require a minimum order of 50 KG for any colour.'
+                          : 'White bags can be ordered from 10 KG. All coloured bags require a minimum order of 50 KG.'}
                       </p>
                     )}
                   </div>
@@ -320,6 +382,36 @@ export default function ProductModal({ isOpen, onClose, product }: { isOpen: boo
                     <h4 className="text-sm font-bold text-stone-50 mb-3 flex items-center gap-2 uppercase tracking-wider opacity-80">
                       <Tag size={16} className="text-green-500" /> 5. Required Quantity (KG)
                     </h4>
+                    
+                    {slabsStr && (
+                      <div className="mb-4">
+                        <p className="text-xs text-stone-400 mb-2">Available Price Slabs for this configuration:</p>
+                        <div className="flex flex-wrap gap-2">
+                          {slabsStr.split(',').map((p, idx) => {
+                            if (!p.includes(':')) return null;
+                            const [range, price] = p.split(':');
+                            let isActive = false;
+                            if (qtyNumber) {
+                              if (range.includes('+')) {
+                                const min = Number(range.replace('+',''));
+                                if (qtyNumber >= min) isActive = true;
+                              } else {
+                                const [min, max] = range.split('-').map(Number);
+                                if (qtyNumber >= min && qtyNumber <= max) isActive = true;
+                              }
+                            }
+                            return (
+                              <div key={idx} className={`px-3 py-2 rounded-lg border text-sm transition-all ${isActive ? 'bg-green-500/20 border-green-500 text-green-400 font-bold' : 'bg-white/5 border-white/10 text-stone-300'}`}>
+                                <span className="opacity-80 mr-2">{range.trim()} KG:</span>
+                                <span>₹{price.trim()}/KG</span>
+                              </div>
+                            );
+                          })}
+                        </div>
+                        <p className="text-xs text-stone-400 mt-3 italic">Number of bags per KG are around 40 to 50.</p>
+                      </div>
+                    )}
+                    
                     <input 
                       type="number" 
                       value={quantity}
@@ -330,76 +422,84 @@ export default function ProductModal({ isOpen, onClose, product }: { isOpen: boo
                     {quantity && !isNaN(Number(quantity)) && Number(quantity) < minOrder && selectedColour && (
                       <p className="text-red-400 text-sm mt-2 flex items-center gap-1.5">
                         <AlertCircle size={16} />
-                        Minimum order for {selectedColour === 'White' ? 'White' : 'coloured'} bags is {minOrder} KG.
+                        Minimum order for {selectedSize === 'Customized Size' ? 'customized' : (selectedColour === 'White' ? 'White' : 'coloured')} bags is {minOrder} KG.
                       </p>
                     )}
                   </div>
+                  
+                  <div className="mt-8">
+                    <button 
+                      onClick={handleAddToOrder}
+                      disabled={!isQtyValid || !pricePerKg}
+                      className={`w-full py-4 rounded-xl flex items-center justify-center gap-2 font-bold transition-colors ${isQtyValid && pricePerKg ? 'bg-green-500 hover:bg-green-400 text-[#041e15] shadow-lg shadow-green-500/20' : 'bg-white/10 text-stone-500 cursor-not-allowed'}`}
+                    >
+                      <Plus size={20} /> Add to Order {totalPrice ? `(₹${totalPrice.toLocaleString()})` : ''}
+                    </button>
+                  </div>
                 </div>
 
-                {/* Final Quotation Summary */}
-                {pricePerKg && totalPrice && isQtyValid ? (
-                  <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="p-6 md:p-8 rounded-3xl bg-gradient-to-br from-white/10 to-white/5 border border-white/20 shadow-2xl relative overflow-hidden">
-                    <div className="absolute top-0 right-0 w-64 h-64 bg-green-500/20 rounded-full blur-[80px] -translate-y-1/2 translate-x-1/3 pointer-events-none" />
+                {/* Professional Order Table */}
+                {orderItems.length > 0 && (
+                  <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="p-6 md:p-8 rounded-3xl bg-white/5 border border-white/10 shadow-2xl overflow-hidden mt-8">
+                    <h3 className="text-2xl font-display font-bold text-white mb-6">Current Order</h3>
                     
-                    <h3 className="text-2xl font-display font-bold text-white mb-6">Quotation Summary</h3>
-                    
-                    <div className="space-y-4 mb-8">
-                      <div className="flex justify-between items-end border-b border-white/10 pb-4">
-                        <span className="text-stone-400">Product</span>
-                        <span className="text-white font-medium text-right">{product.title}</span>
-                      </div>
-                      <div className="flex justify-between items-end border-b border-white/10 pb-4">
-                        <span className="text-stone-400">Selected Size</span>
-                        <span className="text-white font-medium text-right">{selectedSize === 'Customized Size' ? `Custom (${customWidth}" x ${customHeight}")` : selectedSize}</span>
-                      </div>
-                      <div className="flex justify-between items-end border-b border-white/10 pb-4">
-                        <span className="text-stone-400">Selected Colour</span>
-                        <span className="text-white font-medium text-right">{selectedColour}</span>
-                      </div>
-                      <div className="flex justify-between items-end border-b border-white/10 pb-4">
-                        <span className="text-stone-400">GSM</span>
-                        <span className="text-white font-medium text-right">{selectedGSM}</span>
-                      </div>
-                      <div className="flex justify-between items-end border-b border-white/10 pb-4">
-                        <span className="text-stone-400">Printing</span>
-                        <span className="text-white font-medium text-right">{selectedPrinting}</span>
-                      </div>
-                      <div className="flex justify-between items-end border-b border-white/10 pb-4">
-                        <span className="text-stone-400">Price per KG</span>
-                        <span className="text-white font-medium text-right text-lg">₹{pricePerKg}</span>
-                      </div>
-                      <div className="flex justify-between items-end border-b border-white/10 pb-4">
-                        <span className="text-stone-400">Quantity</span>
-                        <span className="text-white font-medium text-right">{quantity} KG</span>
-                      </div>
+                    <div className="overflow-x-auto">
+                      <table className="w-full text-left min-w-[700px]">
+                        <thead>
+                          <tr className="border-b border-white/10 text-stone-400 text-sm">
+                            <th className="pb-4 font-medium">Product</th>
+                            <th className="pb-4 font-medium">Specs</th>
+                            <th className="pb-4 font-medium text-right">Price</th>
+                            <th className="pb-4 font-medium text-right">Qty</th>
+                            <th className="pb-4 font-medium text-right">Units (est.)</th>
+                            <th className="pb-4 font-medium text-right">Total</th>
+                            <th className="pb-4 font-medium w-12"></th>
+                          </tr>
+                        </thead>
+                        <tbody className="text-sm">
+                          {orderItems.map((item) => (
+                            <tr key={item.id} className="border-b border-white/5">
+                              <td className="py-4 text-white font-medium">{item.productTitle}</td>
+                              <td className="py-4 text-stone-300">
+                                {item.size}, {item.colour}<br/>
+                                <span className="text-xs opacity-70">{item.gsm} • {item.printing}</span>
+                              </td>
+                              <td className="py-4 text-right text-stone-300">₹{item.price}/KG</td>
+                              <td className="py-4 text-right text-stone-300">{item.quantity} KG</td>
+                              <td className="py-4 text-right text-stone-300">~{item.quantity * 40} - {item.quantity * 50} bags</td>
+                              <td className="py-4 text-right text-white font-medium">₹{(item.quantity * item.price).toLocaleString()}</td>
+                              <td className="py-4 text-right">
+                                <button onClick={() => handleDeleteItem(item.id)} className="text-stone-500 hover:text-red-400 transition-colors p-2">
+                                  <Trash2 size={16} />
+                                </button>
+                              </td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
                     </div>
                     
-                    <div className="bg-black/40 rounded-2xl p-6 mb-8 border border-white/10 flex flex-col md:flex-row items-center justify-between gap-4">
+                    <div className="mt-6 border-t border-white/10 pt-6 flex justify-between items-end">
                       <div>
-                        <p className="text-stone-400 text-sm mb-1">Estimated Total Price</p>
-                        <p className="text-xs text-stone-500">₹{pricePerKg} × {quantity} KG</p>
+                        <p className="text-stone-400 text-sm">Total Items: {orderItems.length}</p>
                       </div>
-                      <div className="text-4xl font-bold text-green-400">
-                        ₹{totalPrice.toLocaleString()}
+                      <div className="text-right">
+                        <p className="text-stone-400 text-sm mb-1">Grand Total</p>
+                        <p className="text-3xl font-bold text-green-400">
+                          ₹{orderItems.reduce((sum, item) => sum + (item.quantity * item.price), 0).toLocaleString()}
+                        </p>
                       </div>
                     </div>
 
-                    <div className="grid sm:grid-cols-2 gap-4">
+                    <div className="grid sm:grid-cols-2 gap-4 mt-8">
                       <a href={`https://wa.me/918897564055?text=${generateWhatsAppMessage()}`} target="_blank" rel="noreferrer" className="flex items-center justify-center gap-2 px-6 py-4 rounded-xl bg-green-500 text-[#041e15] font-bold hover:bg-green-400 transition-colors shadow-lg shadow-green-500/20">
-                        <MessageCircle size={20} /> WhatsApp Quote
+                        <MessageCircle size={20} /> Generate Final Quote
                       </a>
-                      <button onClick={handleDownloadPdf} className="flex items-center justify-center gap-2 px-6 py-4 rounded-xl bg-white text-black font-bold hover:bg-gray-200 transition-colors">
+                      <button onClick={() => {alert('Quotation PDF downloading...'); window.print();}} className="flex items-center justify-center gap-2 px-6 py-4 rounded-xl bg-white/10 text-white font-bold hover:bg-white/20 transition-colors border border-white/10">
                         <FileDown size={20} /> Download PDF
-                      </button>
-                      <button onClick={handleEmailQuote} className="flex items-center justify-center gap-2 px-6 py-4 rounded-xl bg-white/10 text-white font-bold hover:bg-white/20 transition-colors sm:col-span-2 border border-white/10">
-                        <Mail size={20} /> Email Quote
                       </button>
                     </div>
                   </motion.div>
-                ) : (
-                  <div className="p-8 rounded-3xl bg-white/5 border border-white/10 text-center">
-                    <p className="text-stone-400">Complete all selections above to generate your live wholesale quotation.</p>
-                  </div>
                 )}
 
                 <div className="w-full h-[1px] bg-white/10 my-8" />

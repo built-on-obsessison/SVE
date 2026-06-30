@@ -8,7 +8,7 @@ export interface PricingRule {
   colour: string;
   gsm: string;
   printing: string;
-  pricePerKg: number;
+  slabs: string; // Format: "10-29:85, 30-49:80, 50+:75"
 }
 
 export default function AdminPanel() {
@@ -17,15 +17,14 @@ export default function AdminPanel() {
   const [password, setPassword] = useState('');
 
   useEffect(() => {
-    const savedRules = localStorage.getItem('sve_pricing_rules');
+    const savedRules = localStorage.getItem('sve_pricing_rules_v2');
     if (savedRules) {
       setRules(JSON.parse(savedRules));
     } else {
       // Default sample rules
       setRules([
-        { id: '1', product: 'D-Cut Bags', size: '12×16', colour: 'White', gsm: '80 GSM', printing: 'Plain', pricePerKg: 82 },
-        { id: '2', product: 'D-Cut Bags', size: '12×16', colour: 'Green', gsm: '80 GSM', printing: 'Plain', pricePerKg: 88 },
-        { id: '3', product: 'D-Cut Bags', size: '12×16', colour: 'White', gsm: '80 GSM', printing: 'Double Side Printing', pricePerKg: 96 }
+        { id: '1', product: 'Any', size: 'Any', colour: 'White', gsm: 'Any', printing: 'Any', slabs: '10-29:85, 30-49:80, 50-74:75, 75-99:70, 100+:65' },
+        { id: '2', product: 'Any', size: 'Any', colour: 'Any', gsm: 'Any', printing: 'Any', slabs: '50-74:80, 75-99:75, 100+:70' },
       ]);
     }
   }, []);
@@ -41,7 +40,7 @@ export default function AdminPanel() {
 
   const saveRules = (newRules: PricingRule[]) => {
     setRules(newRules);
-    localStorage.setItem('sve_pricing_rules', JSON.stringify(newRules));
+    localStorage.setItem('sve_pricing_rules_v2', JSON.stringify(newRules));
   };
 
   const addRule = () => {
@@ -52,12 +51,12 @@ export default function AdminPanel() {
       colour: 'Any',
       gsm: 'Any',
       printing: 'Any',
-      pricePerKg: 0
+      slabs: '10-29:85, 30-49:80, 50-74:75, 75-99:70, 100+:65'
     };
     saveRules([...rules, newRule]);
   };
 
-  const updateRule = (id: string, field: keyof PricingRule, value: string | number) => {
+  const updateRule = (id: string, field: keyof PricingRule, value: string) => {
     const newRules = rules.map(rule => rule.id === id ? { ...rule, [field]: value } : rule);
     saveRules(newRules);
   };
@@ -107,7 +106,7 @@ export default function AdminPanel() {
                 <th className="pb-4 font-medium">Colour</th>
                 <th className="pb-4 font-medium">GSM</th>
                 <th className="pb-4 font-medium">Printing</th>
-                <th className="pb-4 font-medium">Price (₹/KG)</th>
+                <th className="pb-4 font-medium">Price Slabs</th>
                 <th className="pb-4 font-medium w-16"></th>
               </tr>
             </thead>
@@ -130,7 +129,7 @@ export default function AdminPanel() {
                     <input type="text" value={rule.printing} onChange={(e) => updateRule(rule.id, 'printing', e.target.value)} className="w-full bg-transparent border border-white/10 rounded px-2 py-1 text-sm focus:border-green-500 outline-none" />
                   </td>
                   <td className="py-3 pr-2">
-                    <input type="number" value={rule.pricePerKg} onChange={(e) => updateRule(rule.id, 'pricePerKg', Number(e.target.value))} className="w-full bg-transparent border border-white/10 rounded px-2 py-1 text-sm focus:border-green-500 outline-none" />
+                    <input type="text" value={rule.slabs} onChange={(e) => updateRule(rule.id, 'slabs', e.target.value)} placeholder="10-29:85, 30-49:80, 50-74:75, 75-99:70, 100+:65" className="w-full bg-transparent border border-white/10 rounded px-2 py-1 text-sm focus:border-green-500 outline-none" />
                   </td>
                   <td className="py-3 text-right">
                     <button onClick={() => deleteRule(rule.id)} className="p-2 text-stone-500 hover:text-red-400 transition-colors rounded-lg hover:bg-white/5">

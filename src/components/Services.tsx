@@ -3,6 +3,17 @@ import { motion } from 'motion/react';
 import { Package, ShoppingBag, Gift, Box, Leaf, Check } from 'lucide-react';
 import ProductModal from './ProductModal';
 
+export interface OrderItem {
+  id: string;
+  productTitle: string;
+  size: string;
+  colour: string;
+  gsm: string;
+  printing: string;
+  quantity: number;
+  price: number;
+}
+
 const services = [
   {
     title: 'D-Cut Bags',
@@ -87,6 +98,7 @@ function ServiceCard({ service, index, onLearnMore }: { service: any; index: num
 
 export default function Services() {
   const [selectedProduct, setSelectedProduct] = useState<any | null>(null);
+  const [orderItems, setOrderItems] = useState<OrderItem[]>([]);
 
   return (
     <section id="services" className="py-16 md:py-32 bg-transparent relative w-full">
@@ -127,6 +139,8 @@ export default function Services() {
         isOpen={!!selectedProduct} 
         onClose={() => setSelectedProduct(null)} 
         product={selectedProduct} 
+        orderItems={orderItems}
+        setOrderItems={setOrderItems}
       />
     </section>
   );
