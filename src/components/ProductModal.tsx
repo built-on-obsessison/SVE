@@ -223,7 +223,7 @@ export default function ProductModal({
           </div>
 
           <div className="flex-1 overflow-y-auto no-scrollbar scroll-smooth">
-            <div className="grid lg:grid-cols-2 gap-0">
+            <div className="grid lg:grid-cols-2 gap-0 w-full max-w-full">
               
               {/* Left Column: Gallery & Sticky Content */}
               <div className="bg-[#03150e] p-6 md:p-10 border-r border-white/5 relative">
@@ -268,7 +268,7 @@ export default function ProductModal({
               </div>
 
               {/* Right Column: Details & Quotation Builder */}
-              <div className="p-6 md:p-10 space-y-10 text-stone-300">
+              <div className="p-6 md:p-10 space-y-10 text-stone-300 min-w-0">
                 
                 {/* Title & Short Desc */}
                 <div>
@@ -440,10 +440,10 @@ export default function ProductModal({
 
                 {/* Professional Order Table */}
                 {orderItems.length > 0 && (
-                  <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="p-6 md:p-8 rounded-3xl bg-white/5 border border-white/10 shadow-2xl overflow-hidden mt-8">
+                  <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="p-6 md:p-8 rounded-3xl bg-white/5 border border-white/10 shadow-2xl overflow-hidden mt-8 w-full max-w-full box-border">
                     <h3 className="text-2xl font-display font-bold text-white mb-6">Current Order</h3>
                     
-                    <div className="overflow-x-auto">
+                    <div className="overflow-x-auto overflow-y-hidden w-full max-w-full">
                       <table className="w-full text-left min-w-[700px]">
                         <thead>
                           <tr className="border-b border-white/10 text-stone-400 text-sm">
@@ -479,7 +479,7 @@ export default function ProductModal({
                       </table>
                     </div>
                     
-                    <div className="mt-6 border-t border-white/10 pt-6 flex justify-between items-end">
+                    <div className="mt-6 border-t border-white/10 pt-6 flex flex-wrap justify-between items-end gap-4">
                       <div>
                         <p className="text-stone-400 text-sm">Total Items: {orderItems.length}</p>
                       </div>
@@ -492,11 +492,11 @@ export default function ProductModal({
                     </div>
 
                     <div className="grid sm:grid-cols-2 gap-4 mt-8">
-                      <a href={`https://wa.me/918897564055?text=${generateWhatsAppMessage()}`} target="_blank" rel="noreferrer" className="flex items-center justify-center gap-2 px-6 py-4 rounded-xl bg-green-500 text-[#041e15] font-bold hover:bg-green-400 transition-colors shadow-lg shadow-green-500/20">
-                        <MessageCircle size={20} /> Generate Final Quote
+                      <a href={`https://wa.me/918897564055?text=${generateWhatsAppMessage()}`} target="_blank" rel="noreferrer" className="flex items-center justify-center gap-2 px-4 sm:px-6 py-4 rounded-xl bg-green-500 text-[#041e15] font-bold hover:bg-green-400 transition-colors shadow-lg shadow-green-500/20 text-sm sm:text-base">
+                        <MessageCircle size={18} className="shrink-0" /> <span className="truncate">Generate Quote</span>
                       </a>
-                      <button onClick={() => {alert('Quotation PDF downloading...'); window.print();}} className="flex items-center justify-center gap-2 px-6 py-4 rounded-xl bg-white/10 text-white font-bold hover:bg-white/20 transition-colors border border-white/10">
-                        <FileDown size={20} /> Download PDF
+                      <button onClick={() => {alert('Quotation PDF downloading...'); window.print();}} className="flex items-center justify-center gap-2 px-4 sm:px-6 py-4 rounded-xl bg-white/10 text-white font-bold hover:bg-white/20 transition-colors border border-white/10 text-sm sm:text-base">
+                        <FileDown size={18} className="shrink-0" /> <span className="truncate">Download PDF</span>
                       </button>
                     </div>
                   </motion.div>
