@@ -42,7 +42,7 @@ const services = [
   },
 ];
 
-function ServiceCard({ service, index, onLearnMore }: { service: any; index: number; onLearnMore: () => void }) {
+function ServiceCard({ service, index, onLearnMore }: { service: any; index: number; onLearnMore: () => void; key?: string | number }) {
   return (
     <motion.div
       initial={{ opacity: 0, y: 30 }}
