@@ -3,9 +3,9 @@ import { MapPin, Phone, Mail, Clock, Send } from 'lucide-react';
 
 export default function Contact() {
   return (
-    <section id="contact" className="py-32 bg-transparent">
-      <div className="max-w-7xl mx-auto px-6 md:px-12">
-        <div className="grid lg:grid-cols-2 gap-16">
+    <section id="contact" className="py-16 md:py-32 bg-transparent w-full">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-12 w-full">
+        <div className="grid lg:grid-cols-2 gap-10 lg:gap-16">
           
           {/* Contact Info */}
           <div>
@@ -22,7 +22,7 @@ export default function Contact() {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ delay: 0.1 }}
-              className="text-4xl md:text-5xl font-display font-bold text-stone-50 leading-tight mb-8"
+              className="text-3xl sm:text-4xl md:text-5xl font-display font-bold text-stone-50 leading-tight mb-8"
             >
               Ready to Make the Eco-Friendly Switch?
             </motion.h2>
@@ -83,7 +83,7 @@ export default function Contact() {
                 </div>
                 <div>
                   <h4 className="font-display font-bold text-stone-50 text-lg">Email</h4>
-                  <a href="mailto:sreevaishnaviecoenterprises@gmail.com" className="text-stone-300 hover:text-green-400 transition-colors mt-1 block">sreevaishnaviecoenterprises@gmail.com</a>
+                  <a href="mailto:sreevaishnaviecoenterprises@gmail.com" className="text-stone-300 hover:text-green-400 transition-colors mt-1 block break-words break-all">sreevaishnaviecoenterprises@gmail.com</a>
                 </div>
               </motion.div>
 

@@ -2,18 +2,23 @@ import { Leaf, ArrowUpRight } from 'lucide-react';
 
 export default function Footer() {
   return (
-    <footer className="bg-black/20 backdrop-blur-xl border-t border-white/10 text-stone-50 pt-20 pb-10 rounded-t-[40px] mt-[-40px] relative z-10">
-      <div className="max-w-7xl mx-auto px-6 md:px-12">
-        <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-12 mb-16">
+    <footer className="bg-black/20 backdrop-blur-xl border-t border-white/10 text-stone-50 pt-16 md:pt-20 pb-10 rounded-t-[40px] mt-[-40px] relative z-10 w-full overflow-hidden">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-12 w-full">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-10 lg:gap-12 mb-16">
           
           <div className="lg:col-span-2">
-            <div className="flex items-center gap-2 mb-6">
-              <div className="w-10 h-10 rounded-full bg-green-500 flex items-center justify-center text-[#041e15]">
-                <Leaf size={20} />
+            <div className="flex items-center gap-3 mb-6">
+              <div className="w-12 h-10 rounded-lg bg-green-500 flex items-center justify-center font-bold text-white text-lg">
+                SVE
               </div>
-              <span className="font-display font-bold text-2xl tracking-tight text-white">
-                Sree Vaishnavi
-              </span>
+              <div className="leading-tight">
+                <span className="block font-display font-bold text-xl tracking-tight text-white">
+                  Sree Vaishnavi
+                </span>
+                <span className="block text-[10px] md:text-xs opacity-60 uppercase tracking-widest text-stone-300">
+                  Eco Enterprises
+                </span>
+              </div>
             </div>
             <p className="text-stone-300 opacity-80 mb-8 max-w-sm leading-relaxed">
               Carry Green, Carry Smart. Premium quality eco-friendly bags manufactured for a sustainable future.
@@ -46,11 +51,11 @@ export default function Footer() {
 
         </div>
 
-        <div className="border-t border-white/10 pt-8 flex flex-col md:flex-row justify-between items-center gap-4">
+        <div className="border-t border-white/10 pt-8 flex flex-col md:flex-row justify-between items-center gap-4 text-center md:text-left">
           <p className="text-stone-400 text-sm">
             © {new Date().getFullYear()} Sree Vaishnavi Eco Enterprises. All rights reserved.
           </p>
-          <div className="flex gap-6 text-sm text-stone-400">
+          <div className="flex flex-wrap justify-center md:justify-end gap-6 text-sm text-stone-400">
             <a href="#" className="hover:text-white transition-colors">Privacy Policy</a>
             <a href="#" className="hover:text-white transition-colors">Terms of Service</a>
           </div>

@@ -14,7 +14,7 @@ import Footer from './components/Footer';
 
 export default function App() {
   return (
-    <div className="flex flex-col min-h-screen font-sans text-stone-50 selection:bg-green-500/30 selection:text-white w-full overflow-hidden">
+    <div className="flex flex-col min-h-screen font-sans text-stone-50 selection:bg-green-500/30 selection:text-white w-full overflow-x-hidden">
       <Navbar />
       <main>
         <Hero />

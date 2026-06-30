@@ -26,9 +26,9 @@ const steps = [
 
 export default function Process() {
   return (
-    <section id="process" className="py-32 bg-transparent">
-      <div className="max-w-7xl mx-auto px-6 md:px-12">
-        <div className="text-center max-w-2xl mx-auto mb-20">
+    <section id="process" className="py-16 md:py-32 bg-transparent w-full">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-12 w-full">
+        <div className="text-center max-w-2xl mx-auto mb-12 md:mb-20">
           <motion.p
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
@@ -42,13 +42,13 @@ export default function Process() {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ delay: 0.1 }}
-            className="text-4xl md:text-5xl font-display font-bold text-stone-50 leading-tight"
+            className="text-3xl sm:text-4xl md:text-5xl font-display font-bold text-stone-50 leading-tight"
           >
             A Seamless Process from Order to Delivery
           </motion.h2>
         </div>
 
-        <div className="grid md:grid-cols-4 gap-8 relative">
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-8 md:gap-6 lg:gap-8 relative">
           {/* Connector Line (Desktop) */}
           <div className="hidden md:block absolute top-1/2 left-0 w-full h-[1px] bg-white/10 -translate-y-1/2 z-0" />
 

@@ -28,19 +28,19 @@ export default function Navbar() {
         animate={{ y: 0 }}
         transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
         className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
-          isScrolled ? 'py-4 glass-panel' : 'py-6 bg-transparent'
+          isScrolled ? 'py-3 md:py-4 glass-panel' : 'py-4 md:py-6 bg-transparent'
         }`}
       >
-        <div className="max-w-7xl mx-auto px-6 md:px-12 flex justify-between items-center">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-12 flex justify-between items-center w-full">
           <a href="#" className="flex items-center gap-3 group">
             <div className="w-12 h-10 rounded-lg bg-green-500 flex items-center justify-center font-bold text-white text-lg group-hover:scale-105 transition-transform">
               SVE
             </div>
             <div className="leading-tight">
-              <span className="block font-display font-bold text-xl tracking-tight text-stone-50">
+              <span className="block font-display font-bold text-lg md:text-xl tracking-tight text-stone-50">
                 Sree Vaishnavi
               </span>
-              <span className="block text-xs opacity-60 uppercase tracking-widest text-stone-300">
+              <span className="block text-[10px] md:text-xs opacity-60 uppercase tracking-widest text-stone-300">
                 Eco Enterprises
               </span>
             </div>
@@ -94,18 +94,18 @@ export default function Navbar() {
             initial={{ opacity: 0, y: -20 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -20 }}
-            className="fixed inset-0 z-50 bg-[#041e15]/95 backdrop-blur-xl flex flex-col px-6 py-8"
+            className="fixed inset-0 z-50 bg-[#041e15]/95 backdrop-blur-xl flex flex-col px-4 sm:px-6 py-6 md:py-8"
           >
-            <div className="flex justify-between items-center mb-12">
+            <div className="flex justify-between items-center mb-10">
               <div className="flex items-center gap-3 group">
                 <div className="w-12 h-10 rounded-lg bg-green-500 flex items-center justify-center font-bold text-white text-lg">
                   SVE
                 </div>
-                <div className="leading-tight">
-                  <span className="block font-display font-bold text-xl tracking-tight text-stone-50">
+                <div className="leading-tight truncate">
+                  <span className="block font-display font-bold text-base sm:text-lg md:text-xl tracking-tight text-stone-50 truncate">
                     Sree Vaishnavi
                   </span>
-                  <span className="block text-xs opacity-60 uppercase tracking-widest text-stone-300">
+                  <span className="block text-[10px] md:text-xs opacity-60 uppercase tracking-widest text-stone-300">
                     Eco Enterprises
                   </span>
                 </div>
