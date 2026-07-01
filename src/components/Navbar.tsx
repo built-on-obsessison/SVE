@@ -61,14 +61,14 @@ export default function Navbar() {
             </div>
             <div className="flex items-center gap-3">
               <a
-                href="tel:+918897564055"
+                href="tel:+919949938277"
                 className="flex items-center gap-2 px-4 py-2 rounded-full border border-white/20 text-stone-50 hover:bg-white/10 transition-colors text-sm font-medium"
               >
                 <Phone size={16} />
                 Call
               </a>
               <a
-                href="https://wa.me/918897564055"
+                href="https://wa.me/919949938277"
                 className="flex items-center gap-2 px-4 py-2 rounded-full bg-green-500 text-[#041e15] hover:bg-green-400 transition-colors text-sm font-bold shadow-lg shadow-green-500/20"
               >
                 <MessageCircle size={16} />
@@ -131,7 +131,7 @@ export default function Navbar() {
               ))}
               <div className="flex flex-col gap-4 mt-4">
                 <a
-                  href="tel:+918897564055"
+                  href="tel:+919949938277"
                   onClick={() => setMobileMenuOpen(false)}
                   className="flex items-center justify-center gap-2 w-full py-4 rounded-xl border border-white/20 text-stone-50 text-lg font-medium hover:bg-white/10 transition-colors"
                 >
@@ -139,7 +139,7 @@ export default function Navbar() {
                   Call Us
                 </a>
                 <a
-                  href="https://wa.me/918897564055"
+                  href="https://wa.me/919949938277"
                   onClick={() => setMobileMenuOpen(false)}
                   className="flex items-center justify-center gap-2 w-full py-4 rounded-xl bg-green-500 text-[#041e15] text-lg font-bold hover:bg-green-400 transition-colors"
                 >

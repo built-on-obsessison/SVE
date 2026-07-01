@@ -256,10 +256,10 @@ export default function ProductModal({
                       Build Quotation
                     </button>
                     <div className="grid grid-cols-2 gap-3">
-                      <a href="tel:+918897564055" className="btn-secondary justify-center gap-2">
+                      <a href="tel:+919949938277" className="btn-secondary justify-center gap-2">
                         <Phone size={18} /> Call Now
                       </a>
-                      <a href="https://wa.me/918897564055" className="flex items-center justify-center gap-2 px-6 py-3 rounded-full bg-green-500 text-[#041e15] font-bold hover:bg-green-400 transition-colors">
+                      <a href="https://wa.me/919949938277" className="flex items-center justify-center gap-2 px-6 py-3 rounded-full bg-green-500 text-[#041e15] font-bold hover:bg-green-400 transition-colors">
                         <MessageCircle size={18} /> WhatsApp
                       </a>
                     </div>
@@ -492,7 +492,7 @@ export default function ProductModal({
                     </div>
 
                     <div className="grid sm:grid-cols-2 gap-4 mt-8">
-                      <a href={`https://wa.me/918897564055?text=${generateWhatsAppMessage()}`} target="_blank" rel="noreferrer" className="flex items-center justify-center gap-2 px-4 sm:px-6 py-4 rounded-xl bg-green-500 text-[#041e15] font-bold hover:bg-green-400 transition-colors shadow-lg shadow-green-500/20 text-sm sm:text-base">
+                      <a href={`https://wa.me/919949938277?text=${generateWhatsAppMessage()}`} target="_blank" rel="noreferrer" className="flex items-center justify-center gap-2 px-4 sm:px-6 py-4 rounded-xl bg-green-500 text-[#041e15] font-bold hover:bg-green-400 transition-colors shadow-lg shadow-green-500/20 text-sm sm:text-base">
                         <MessageCircle size={18} className="shrink-0" /> <span className="truncate">Generate Quote</span>
                       </a>
                       <button onClick={() => {alert('Quotation PDF downloading...'); window.print();}} className="flex items-center justify-center gap-2 px-4 sm:px-6 py-4 rounded-xl bg-white/10 text-white font-bold hover:bg-white/20 transition-colors border border-white/10 text-sm sm:text-base">
@@ -541,10 +541,10 @@ export default function ProductModal({
               <button onClick={() => document.getElementById('inquiry')?.scrollIntoView({ behavior: 'smooth' })} className="btn-primary flex-1 justify-center py-3 text-sm">
                 Build Quote
               </button>
-              <a href="tel:+918897564055" className="w-12 h-12 rounded-full border border-white/20 flex items-center justify-center text-white shrink-0 hover:bg-white/10 transition-colors">
+              <a href="tel:+919949938277" className="w-12 h-12 rounded-full border border-white/20 flex items-center justify-center text-white shrink-0 hover:bg-white/10 transition-colors">
                 <Phone size={18} />
               </a>
-              <a href="https://wa.me/918897564055" className="w-12 h-12 rounded-full bg-green-500 flex items-center justify-center text-[#041e15] shrink-0 hover:bg-green-400 transition-colors">
+              <a href="https://wa.me/919949938277" className="w-12 h-12 rounded-full bg-green-500 flex items-center justify-center text-[#041e15] shrink-0 hover:bg-green-400 transition-colors">
                 <MessageCircle size={18} />
               </a>
             </div>

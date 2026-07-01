@@ -66,7 +66,7 @@ export default function Contact() {
                 <div>
                   <h4 className="font-display font-bold text-stone-50 text-lg">Call or WhatsApp</h4>
                   <div className="flex flex-col gap-1 mt-1">
-                    <a href="tel:+918897564055" className="text-stone-300 hover:text-green-400 transition-colors">+91 88975 64055</a>
+                    <a href="tel:+919949938277" className="text-stone-300 hover:text-green-400 transition-colors">+91 99499 38277</a>
                   </div>
                 </div>
               </motion.div>

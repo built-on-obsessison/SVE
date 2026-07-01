@@ -46,7 +46,7 @@ export default function Hero() {
             className="flex flex-col md:flex-row gap-4 w-full md:w-auto"
           >
             <a
-              href="tel:+918897564055"
+              href="tel:+919949938277"
               className="btn-primary w-full md:w-auto justify-center"
             >
               Call Now
