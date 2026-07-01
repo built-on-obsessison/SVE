@@ -191,7 +191,28 @@ export default function ProductModal({
     }
 
     msg += `Please contact me.`;
-    return encodeURIComponent(msg);
+    return msg;
+  };
+
+  const handleGenerateQuote = async (e: React.MouseEvent<HTMLAnchorElement>) => {
+    e.preventDefault();
+    const msg = generateWhatsAppMessage();
+
+    if (printingFiles.length > 0 && navigator.canShare && navigator.canShare({ files: printingFiles })) {
+      try {
+        await navigator.share({
+          files: printingFiles,
+          title: 'Quotation Request',
+          text: msg,
+        });
+        return;
+      } catch (error) {
+        console.error('Error sharing:', error);
+      }
+    }
+    
+    // Fallback to direct wa.me link
+    window.open(`https://wa.me/919949938277?text=${encodeURIComponent(msg)}`, '_blank');
   };
 
   const handleDownloadPdf = () => {
@@ -547,7 +568,7 @@ export default function ProductModal({
                           </div>
                           {printingFiles.length > 0 && (
                             <p className="text-xs text-stone-500 mt-2">
-                              Note: Reference pictures cannot be directly attached to WhatsApp via this button, but mentioning them will notify the team to ask for them.
+                              Note: When you click Generate Quote, your device will prompt you to share these pictures directly to WhatsApp.
                             </p>
                           )}
                         </div>
@@ -555,7 +576,7 @@ export default function ProductModal({
                     </div>
 
                     <div className="grid sm:grid-cols-2 gap-4 mt-8">
-                      <a href={`https://wa.me/919949938277?text=${generateWhatsAppMessage()}`} target="_blank" rel="noreferrer" className="flex items-center justify-center gap-2 px-4 sm:px-6 py-4 rounded-xl bg-green-500 text-[#041e15] font-bold hover:bg-green-400 transition-colors shadow-lg shadow-green-500/20 text-sm sm:text-base">
+                      <a href="#" onClick={handleGenerateQuote} className="flex items-center justify-center gap-2 px-4 sm:px-6 py-4 rounded-xl bg-green-500 text-[#041e15] font-bold hover:bg-green-400 transition-colors shadow-lg shadow-green-500/20 text-sm sm:text-base">
                         <MessageCircle size={18} className="shrink-0" /> <span className="truncate">Generate Quote</span>
                       </a>
                       <button onClick={() => {alert('Quotation PDF downloading...'); window.print();}} className="flex items-center justify-center gap-2 px-4 sm:px-6 py-4 rounded-xl bg-white/10 text-white font-bold hover:bg-white/20 transition-colors border border-white/10 text-sm sm:text-base">
