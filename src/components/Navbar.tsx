@@ -1,12 +1,10 @@
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { Menu, X, Leaf, Phone, MessageCircle, Package } from 'lucide-react';
-import OrdersDashboard from './OrdersDashboard';
+import { Menu, X, Leaf, Phone, MessageCircle } from 'lucide-react';
 
 export default function Navbar() {
   const [isScrolled, setIsScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const [ordersOpen, setOrdersOpen] = useState(false);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -62,13 +60,6 @@ export default function Navbar() {
               ))}
             </div>
             <div className="flex items-center gap-3">
-              <button
-                onClick={() => setOrdersOpen(true)}
-                className="flex items-center gap-2 px-4 py-2 rounded-full border border-white/20 text-stone-50 hover:bg-white/10 transition-colors text-sm font-medium"
-              >
-                <Package size={16} />
-                Orders
-              </button>
               <a
                 href="tel:+919949938277"
                 className="flex items-center gap-2 px-4 py-2 rounded-full border border-white/20 text-stone-50 hover:bg-white/10 transition-colors text-sm font-medium"
@@ -86,21 +77,13 @@ export default function Navbar() {
             </div>
           </div>
 
-          {/* Mobile Menu Toggle & Orders */}
-          <div className="md:hidden flex items-center gap-2">
-            <button
-              onClick={() => setOrdersOpen(true)}
-              className="p-2 text-stone-50"
-            >
-              <Package size={24} />
-            </button>
-            <button
-              className="p-2 text-stone-50"
-              onClick={() => setMobileMenuOpen(true)}
-            >
-              <Menu size={24} />
-            </button>
-          </div>
+          {/* Mobile Menu Toggle */}
+          <button
+            className="md:hidden p-2 text-stone-50"
+            onClick={() => setMobileMenuOpen(true)}
+          >
+            <Menu size={24} />
+          </button>
         </div>
       </motion.nav>
 
@@ -168,8 +151,6 @@ export default function Navbar() {
           </motion.div>
         )}
       </AnimatePresence>
-
-      <OrdersDashboard isOpen={ordersOpen} onClose={() => setOrdersOpen(false)} />
     </>
   );
 }

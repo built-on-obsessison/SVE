@@ -1,10 +1,7 @@
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { X, Phone, MessageCircle, Check, Mail, Droplet, Layers, Tag, FileDown, AlertCircle, Plus, Trash2, LogIn } from 'lucide-react';
+import { X, Phone, MessageCircle, Check, Mail, Droplet, Layers, Tag, FileDown, AlertCircle, Plus, Trash2 } from 'lucide-react';
 import type { OrderItem } from './Services';
-import { useAuth } from '../hooks/useAuth';
-import { signInWithGoogle, db } from '../lib/firebase';
-import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
 
 const productSizes = ['9×12', '10×14', '12×16', '12×18', '13×18', '14×18', '16×20', 'Customized Size'];
 const productColours = [
@@ -55,7 +52,6 @@ export default function ProductModal({
   orderItems: OrderItem[];
   setOrderItems: (items: OrderItem[]) => void;
 }) {
-  const { user } = useAuth();
   const [activeImage, setActiveImage] = useState(0);
   
   // Quotation State
@@ -67,40 +63,6 @@ export default function ProductModal({
   const [selectedGSM, setSelectedGSM] = useState('');
   const [quantity, setQuantity] = useState('');
   const [showPayment, setShowPayment] = useState(false);
-  const [isSaving, setIsSaving] = useState(false);
-
-  const handleSaveOrder = async (status: string) => {
-    try {
-      setIsSaving(true);
-      let currentUser = user;
-      if (!currentUser) {
-        currentUser = await signInWithGoogle();
-      }
-      
-      if (!currentUser) return;
-
-      const grandTotal = orderItems.reduce((sum, item) => sum + (item.quantity * item.price), 0);
-      
-      await addDoc(collection(db, 'orders'), {
-        userId: currentUser.uid,
-        items: orderItems,
-        status: status,
-        totalAmount: grandTotal,
-        advancePaid: status === 'progress',
-        createdAt: serverTimestamp(),
-        updatedAt: serverTimestamp()
-      });
-      
-      alert(status === 'cart' ? 'Order saved to Cart!' : 'Order moved to Progress. We have received your advance payment notification.');
-      setOrderItems([]);
-      setShowPayment(false);
-    } catch (e) {
-      console.error("Error saving order", e);
-      alert('There was an error saving your order. Please try again.');
-    } finally {
-      setIsSaving(false);
-    }
-  };
 
   // Reset state when modal opens/closes
   useEffect(() => {
@@ -532,15 +494,6 @@ export default function ProductModal({
                     </div>
 
                     <div className="mt-8 space-y-4">
-                      <button 
-                        onClick={() => handleSaveOrder('cart')} 
-                        disabled={isSaving}
-                        className="flex items-center justify-center gap-2 px-4 sm:px-6 py-4 rounded-xl border border-white/20 text-white font-bold hover:bg-white/10 transition-colors text-sm sm:text-base w-full"
-                      >
-                        <LogIn size={18} className="shrink-0" /> 
-                        <span className="truncate">Save Order to Cart (Sign in)</span>
-                      </button>
-
                       <a href={`https://wa.me/919949938277?text=${generateWhatsAppMessage()}`} target="_blank" rel="noreferrer" className="flex items-center justify-center gap-2 px-4 sm:px-6 py-4 rounded-xl bg-green-500 text-[#041e15] font-bold hover:bg-green-400 transition-colors shadow-lg shadow-green-500/20 text-sm sm:text-base w-full">
                         <MessageCircle size={18} className="shrink-0" /> <span className="truncate">Chat for printing details</span>
                       </a>
@@ -561,16 +514,6 @@ export default function ProductModal({
                           <p className="text-stone-300 text-sm">Scan QR code or pay to UPI ID:</p>
                           <p className="text-green-400 font-mono font-bold text-lg select-all">9949938277@ybl</p>
                           <p className="text-xs text-stone-500 mt-2">After payment, please share the screenshot on WhatsApp.</p>
-                          
-                          <div className="mt-4 pt-4 border-t border-white/10">
-                            <button 
-                              onClick={() => handleSaveOrder('progress')}
-                              disabled={isSaving}
-                              className="btn-primary w-full justify-center"
-                            >
-                              I have paid the advance
-                            </button>
-                          </div>
                         </div>
                       )}
                     </div>
