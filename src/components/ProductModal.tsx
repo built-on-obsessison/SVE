@@ -63,10 +63,6 @@ export default function ProductModal({
   const [selectedGSM, setSelectedGSM] = useState('');
   const [quantity, setQuantity] = useState('');
 
-  // Order Details State
-  const [printingNotes, setPrintingNotes] = useState('');
-  const [printingFiles, setPrintingFiles] = useState<File[]>([]);
-
   // Reset state when modal opens/closes
   useEffect(() => {
     if (isOpen) {
@@ -180,39 +176,8 @@ export default function ProductModal({
       msg += `${index + 1}. ${item.productTitle} - ${item.size}\n   Colour: ${item.colour} | GSM: ${item.gsm} | Printing: ${item.printing}\n   Qty: ${item.quantity} KG @ ₹${item.price}/KG\n   Subtotal: ₹${item.quantity * item.price}\n\n`;
     });
     const grandTotal = orderItems.reduce((sum, item) => sum + (item.quantity * item.price), 0);
-    msg += `Estimated Grand Total: ₹${grandTotal}\n\n`;
-    
-    if (printingNotes.trim()) {
-      msg += `*Printing Details/Notes:*\n${printingNotes}\n\n`;
-    }
-    
-    if (printingFiles.length > 0) {
-      msg += `*(I have ${printingFiles.length} reference picture(s) to share for printing)*\n\n`;
-    }
-
-    msg += `Please contact me.`;
-    return msg;
-  };
-
-  const handleGenerateQuote = async (e: React.MouseEvent<HTMLAnchorElement>) => {
-    e.preventDefault();
-    const msg = generateWhatsAppMessage();
-
-    if (printingFiles.length > 0 && navigator.canShare && navigator.canShare({ files: printingFiles })) {
-      try {
-        await navigator.share({
-          files: printingFiles,
-          title: 'Quotation Request',
-          text: msg,
-        });
-        return;
-      } catch (error) {
-        console.error('Error sharing:', error);
-      }
-    }
-    
-    // Fallback to direct wa.me link
-    window.open(`https://wa.me/919949938277?text=${encodeURIComponent(msg)}`, '_blank');
+    msg += `Estimated Grand Total: ₹${grandTotal}\n\nI would like to discuss about printing designs.\n\nPlease contact me.`;
+    return encodeURIComponent(msg);
   };
 
   const handleDownloadPdf = () => {
@@ -526,62 +491,10 @@ export default function ProductModal({
                       </div>
                     </div>
 
-                    {/* Printing Details Section */}
-                    <div className="mt-8 border-t border-white/10 pt-6">
-                      <h4 className="text-sm font-bold text-stone-50 mb-4 flex items-center gap-2 uppercase tracking-wider opacity-80">
-                        <Tag size={16} className="text-green-500" /> Additional Printing Details
-                      </h4>
-                      <div className="space-y-4">
-                        <div>
-                          <label className="block text-xs text-stone-400 mb-2">Printing Instructions / Text / Design Notes</label>
-                          <textarea
-                            value={printingNotes}
-                            onChange={(e) => setPrintingNotes(e.target.value)}
-                            className="w-full bg-black/40 border border-white/10 rounded-xl px-4 py-3 text-white focus:border-green-500 focus:ring-1 focus:ring-green-500 outline-none transition-all resize-none h-24"
-                            placeholder="Example: Need the logo centered, text below in green..."
-                          />
-                        </div>
-                        <div>
-                          <label className="block text-xs text-stone-400 mb-2">Reference Pictures (Optional)</label>
-                          <div className="relative">
-                            <input
-                              type="file"
-                              multiple
-                              accept="image/*"
-                              onChange={(e) => {
-                                if (e.target.files) {
-                                  setPrintingFiles(Array.from(e.target.files));
-                                }
-                              }}
-                              className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
-                            />
-                            <div className="flex items-center gap-3 w-full bg-black/40 border border-white/10 rounded-xl px-4 py-3 hover:bg-white/5 transition-colors">
-                              <div className="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center shrink-0">
-                                <span className="text-stone-300">📁</span>
-                              </div>
-                              <div className="flex-1 truncate">
-                                {printingFiles.length > 0 
-                                  ? <span className="text-green-400 font-medium">{printingFiles.length} file(s) selected</span>
-                                  : <span className="text-stone-400 text-sm">Click to upload reference pictures</span>}
-                              </div>
-                            </div>
-                          </div>
-                          {printingFiles.length > 0 && (
-                            <p className="text-xs text-stone-500 mt-2">
-                              Note: When you click Generate Quote, your device will prompt you to share these pictures directly to WhatsApp.
-                            </p>
-                          )}
-                        </div>
-                      </div>
-                    </div>
-
-                    <div className="grid sm:grid-cols-2 gap-4 mt-8">
-                      <a href="#" onClick={handleGenerateQuote} className="flex items-center justify-center gap-2 px-4 sm:px-6 py-4 rounded-xl bg-green-500 text-[#041e15] font-bold hover:bg-green-400 transition-colors shadow-lg shadow-green-500/20 text-sm sm:text-base">
-                        <MessageCircle size={18} className="shrink-0" /> <span className="truncate">Generate Quote</span>
+                    <div className="mt-8">
+                      <a href={`https://wa.me/919949938277?text=${generateWhatsAppMessage()}`} target="_blank" rel="noreferrer" className="flex items-center justify-center gap-2 px-4 sm:px-6 py-4 rounded-xl bg-green-500 text-[#041e15] font-bold hover:bg-green-400 transition-colors shadow-lg shadow-green-500/20 text-sm sm:text-base w-full">
+                        <MessageCircle size={18} className="shrink-0" /> <span className="truncate">Chat for printing details</span>
                       </a>
-                      <button onClick={() => {alert('Quotation PDF downloading...'); window.print();}} className="flex items-center justify-center gap-2 px-4 sm:px-6 py-4 rounded-xl bg-white/10 text-white font-bold hover:bg-white/20 transition-colors border border-white/10 text-sm sm:text-base">
-                        <FileDown size={18} className="shrink-0" /> <span className="truncate">Download PDF</span>
-                      </button>
                     </div>
                   </motion.div>
                 )}
