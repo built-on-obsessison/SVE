@@ -1,7 +1,10 @@
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { X, Phone, MessageCircle, Check, Mail, Droplet, Layers, Tag, FileDown, AlertCircle, Plus, Trash2 } from 'lucide-react';
+import { X, Phone, MessageCircle, Check, Mail, Droplet, Layers, Tag, FileDown, AlertCircle, Plus, Trash2, LogIn } from 'lucide-react';
 import type { OrderItem } from './Services';
+import { useAuth } from '../hooks/useAuth';
+import { signInWithGoogle, db } from '../lib/firebase';
+import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
 
 const productSizes = ['9×12', '10×14', '12×16', '12×18', '13×18', '14×18', '16×20', 'Customized Size'];
 const productColours = [
@@ -52,6 +55,7 @@ export default function ProductModal({
   orderItems: OrderItem[];
   setOrderItems: (items: OrderItem[]) => void;
 }) {
+  const { user } = useAuth();
   const [activeImage, setActiveImage] = useState(0);
   
   // Quotation State
@@ -62,6 +66,41 @@ export default function ProductModal({
   const [selectedPrinting, setSelectedPrinting] = useState('');
   const [selectedGSM, setSelectedGSM] = useState('');
   const [quantity, setQuantity] = useState('');
+  const [showPayment, setShowPayment] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
+
+  const handleSaveOrder = async (status: string) => {
+    try {
+      setIsSaving(true);
+      let currentUser = user;
+      if (!currentUser) {
+        currentUser = await signInWithGoogle();
+      }
+      
+      if (!currentUser) return;
+
+      const grandTotal = orderItems.reduce((sum, item) => sum + (item.quantity * item.price), 0);
+      
+      await addDoc(collection(db, 'orders'), {
+        userId: currentUser.uid,
+        items: orderItems,
+        status: status,
+        totalAmount: grandTotal,
+        advancePaid: status === 'progress',
+        createdAt: serverTimestamp(),
+        updatedAt: serverTimestamp()
+      });
+      
+      alert(status === 'cart' ? 'Order saved to Cart!' : 'Order moved to Progress. We have received your advance payment notification.');
+      setOrderItems([]);
+      setShowPayment(false);
+    } catch (e) {
+      console.error("Error saving order", e);
+      alert('There was an error saving your order. Please try again.');
+    } finally {
+      setIsSaving(false);
+    }
+  };
 
   // Reset state when modal opens/closes
   useEffect(() => {
@@ -74,6 +113,7 @@ export default function ProductModal({
       setSelectedPrinting('');
       setSelectedGSM('');
       setQuantity('');
+      setShowPayment(false);
     } else {
       document.body.style.overflow = 'unset';
     }
@@ -491,10 +531,48 @@ export default function ProductModal({
                       </div>
                     </div>
 
-                    <div className="mt-8">
+                    <div className="mt-8 space-y-4">
+                      <button 
+                        onClick={() => handleSaveOrder('cart')} 
+                        disabled={isSaving}
+                        className="flex items-center justify-center gap-2 px-4 sm:px-6 py-4 rounded-xl border border-white/20 text-white font-bold hover:bg-white/10 transition-colors text-sm sm:text-base w-full"
+                      >
+                        <LogIn size={18} className="shrink-0" /> 
+                        <span className="truncate">Save Order to Cart (Sign in)</span>
+                      </button>
+
                       <a href={`https://wa.me/919949938277?text=${generateWhatsAppMessage()}`} target="_blank" rel="noreferrer" className="flex items-center justify-center gap-2 px-4 sm:px-6 py-4 rounded-xl bg-green-500 text-[#041e15] font-bold hover:bg-green-400 transition-colors shadow-lg shadow-green-500/20 text-sm sm:text-base w-full">
                         <MessageCircle size={18} className="shrink-0" /> <span className="truncate">Chat for printing details</span>
                       </a>
+                      
+                      {!showPayment ? (
+                        <button onClick={() => setShowPayment(true)} className="flex items-center justify-center gap-2 px-4 sm:px-6 py-4 rounded-xl bg-white/10 text-white font-bold hover:bg-white/20 transition-colors border border-white/10 text-sm sm:text-base w-full">
+                          <Check size={18} className="shrink-0" /> <span className="truncate">Printing details are confirmed</span>
+                        </button>
+                      ) : (
+                        <div className="p-6 rounded-2xl bg-[#041e15] border border-green-500/30 text-center space-y-4 mt-4 animate-in fade-in slide-in-from-top-4">
+                          <h4 className="text-xl font-bold text-white mb-1">Advance Payment (30%)</h4>
+                          <p className="text-3xl font-bold text-green-400 mb-6">
+                            ₹{Math.round(orderItems.reduce((sum, item) => sum + (item.quantity * item.price), 0) * 0.3).toLocaleString()}
+                          </p>
+                          <div className="bg-white p-4 rounded-xl inline-block mb-2">
+                             <img src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=upi://pay?pa=9949938277@ybl&pn=Sri%20Laxmi%20Bhavani&cu=INR" alt="UPI QR Code" className="w-32 h-32" />
+                          </div>
+                          <p className="text-stone-300 text-sm">Scan QR code or pay to UPI ID:</p>
+                          <p className="text-green-400 font-mono font-bold text-lg select-all">9949938277@ybl</p>
+                          <p className="text-xs text-stone-500 mt-2">After payment, please share the screenshot on WhatsApp.</p>
+                          
+                          <div className="mt-4 pt-4 border-t border-white/10">
+                            <button 
+                              onClick={() => handleSaveOrder('progress')}
+                              disabled={isSaving}
+                              className="btn-primary w-full justify-center"
+                            >
+                              I have paid the advance
+                            </button>
+                          </div>
+                        </div>
+                      )}
                     </div>
                   </motion.div>
                 )}
